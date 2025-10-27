@@ -22,3 +22,7 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 toon-*.tar
 
+# Ignore Dialyzer PLT files (they're built locally)
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
+

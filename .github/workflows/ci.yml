@@ -24,6 +24,9 @@ jobs:
           # Elixir 1.16 doesn't support OTP 27
           - elixir: '1.16'
             otp: '27'
+          # Elixir 1.19 doesn't support OTP 25
+          - elixir: '1.19'
+            otp: '25'
 
     steps:
       - name: Checkout code
