@@ -115,7 +115,7 @@ jobs:
         run: mix dialyzer --plt
 
       - name: Run Dialyzer
-        run: mix dialyzer --format github
+        run: mix dialyzer
 
   coverage:
     name: Test Coverage
