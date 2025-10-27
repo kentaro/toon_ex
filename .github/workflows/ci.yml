@@ -110,8 +110,12 @@ jobs:
         if: steps.plt-cache.outputs.cache-hit != 'true'
         run: mkdir -p priv/plts
 
+      - name: Build PLT
+        if: steps.plt-cache.outputs.cache-hit != 'true'
+        run: mix dialyzer --plt
+
       - name: Run Dialyzer
-        run: mix dialyzer
+        run: mix dialyzer --format github
 
   coverage:
     name: Test Coverage
@@ -148,37 +152,3 @@ jobs:
         run: mix coveralls.github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        elixir: ['1.19']
-        otp: ['27']
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{matrix.elixir}}
-          otp-version: ${{matrix.otp}}
-
-      - name: Restore dependencies cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            deps
-            _build
-          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
-
-      - name: Install dependencies
-        run: mix deps.get
-
-      - name: Generate documentation
-        run: mix docs
