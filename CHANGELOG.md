@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-10-28
+
+### Fixed
+- Tabular array data rows now properly indented at depth + 1
+- List-style array items now properly indented
+- Top-level arrays no longer include spurious "items[N]:" header
+- README examples updated to match actual output
+
+### Added
+- Comprehensive doctests for all modules (110 doctests total)
+- 12 new doctest files covering encode, decode, shared, and error modules
+- Integration tests for array indentation at all nesting levels
+
 ## [0.1.0] - 2025-10-28
 
 ### Added
@@ -20,5 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete documentation with examples
 - Benchmarks comparing TOON vs JSON token efficiency
 
-[Unreleased]: https://github.com/kentaro/toon_ex/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kentaro/toon_ex/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kentaro/toon_ex/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kentaro/toon_ex/releases/tag/v0.1.0
