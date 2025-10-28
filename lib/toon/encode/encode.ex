@@ -140,6 +140,7 @@ defmodule Toon.Encode do
         else
           # For complex top-level arrays, encode as list items without header
           [_header | items] = Arrays.encode_list("items", data, depth, opts)
+
           items
           |> Enum.map_join("\n", &IO.iodata_to_binary/1)
         end

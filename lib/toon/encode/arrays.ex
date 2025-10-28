@@ -228,6 +228,7 @@ defmodule Toon.Encode.Arrays do
 
     if needs_marker do
       [first_line | rest] = nested
+
       [
         [Constants.list_item_marker(), Constants.space(), first_line]
         | Enum.map(rest, fn line -> [opts.indent_string, line] end)
