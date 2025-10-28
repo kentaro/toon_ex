@@ -38,9 +38,9 @@ defmodule Toon.Types do
 
   ## Examples
 
-      iex> Toon.encode!(data, indent: 4)
-      iex> Toon.encode!(data, delimiter: "\\t")
-      iex> Toon.encode!(data, length_marker: "#")
+      Toon.encode!(data, indent: 4)
+      Toon.encode!(data, delimiter: "\\t")
+      Toon.encode!(data, length_marker: "#")
   """
   @type encode_opts :: [encode_opt()]
 
@@ -68,8 +68,8 @@ defmodule Toon.Types do
 
   ## Examples
 
-      iex> Toon.decode!(toon, keys: :strings)
-      iex> Toon.decode!(toon, keys: :atoms)
+      Toon.decode!(toon, keys: :strings)
+      Toon.decode!(toon, keys: :atoms)
   """
   @type decode_opts :: [decode_opt()]
 

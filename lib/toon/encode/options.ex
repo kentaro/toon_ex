@@ -35,16 +35,16 @@ defmodule Toon.Encode.Options do
   ## Examples
 
       iex> Toon.Encode.Options.validate([])
-      {:ok, %{indent: 2, delimiter: ",", length_marker: nil}}
+      {:ok, %{indent: 2, delimiter: ",", length_marker: nil, indent_string: "  "}}
 
       iex> Toon.Encode.Options.validate(indent: 4, delimiter: "\\t")
-      {:ok, %{indent: 4, delimiter: "\\t", length_marker: nil}}
+      {:ok, %{indent: 4, delimiter: "\\t", length_marker: nil, indent_string: "    "}}
 
-      iex> Toon.Encode.Options.validate(indent: -1)
-      {:error, _}
+      iex> match?({:error, _}, Toon.Encode.Options.validate(indent: -1))
+      true
 
-      iex> Toon.Encode.Options.validate(delimiter: "invalid")
-      {:error, _}
+      iex> match?({:error, _}, Toon.Encode.Options.validate(delimiter: "invalid"))
+      true
   """
   @spec validate(keyword()) :: {:ok, map()} | {:error, NimbleOptions.ValidationError.t()}
   def validate(opts) when is_list(opts) do
@@ -54,7 +54,11 @@ defmodule Toon.Encode.Options do
 
         # Additional validation for delimiter
         if valid_delimiter?(validated_map.delimiter) do
-          {:ok, validated_map}
+          # Add computed indent_string based on indent value
+          validated_with_indent =
+            Map.put(validated_map, :indent_string, String.duplicate(" ", validated_map.indent))
+
+          {:ok, validated_with_indent}
         else
           {:error,
            %NimbleOptions.ValidationError{
@@ -76,16 +80,20 @@ defmodule Toon.Encode.Options do
   ## Examples
 
       iex> Toon.Encode.Options.validate!([])
-      %{indent: 2, delimiter: ",", length_marker: nil}
+      %{indent: 2, delimiter: ",", length_marker: nil, indent_string: "  "}
 
       iex> Toon.Encode.Options.validate!(indent: 4)
-      %{indent: 4, delimiter: ",", length_marker: nil}
+      %{indent: 4, delimiter: ",", length_marker: nil, indent_string: "    "}
   """
   @spec validate!(keyword()) :: map()
   def validate!(opts) when is_list(opts) do
     case validate(opts) do
-      {:ok, validated} -> validated
-      {:error, error} -> raise ArgumentError, Exception.message(error)
+      {:ok, validated} ->
+        # Add computed indent_string based on indent value
+        Map.put(validated, :indent_string, String.duplicate(" ", validated.indent))
+
+      {:error, error} ->
+        raise ArgumentError, Exception.message(error)
     end
   end
 

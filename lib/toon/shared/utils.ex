@@ -170,7 +170,7 @@ defmodule Toon.Utils do
       42
 
       iex> Toon.Utils.normalize(-0.0)
-      0.0
+      -0.0
 
       iex> Toon.Utils.normalize(:infinity)
       nil

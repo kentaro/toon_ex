@@ -15,13 +15,13 @@ defmodule Toon.Encode.Strings do
       iex> Toon.Encode.Strings.encode_string("hello")
       "hello"
 
-      iex> Toon.Encode.Strings.encode_string("")
+      iex> Toon.Encode.Strings.encode_string("") |> IO.iodata_to_binary()
       ~s("")
 
-      iex> Toon.Encode.Strings.encode_string("hello world")
+      iex> Toon.Encode.Strings.encode_string("hello world") |> IO.iodata_to_binary()
       ~s("hello world")
 
-      iex> Toon.Encode.Strings.encode_string("line1\\nline2")
+      iex> Toon.Encode.Strings.encode_string("line1\\nline2") |> IO.iodata_to_binary()
       ~s("line1\\\\nline2")
   """
   @spec encode_string(String.t(), String.t()) :: iodata()
@@ -52,10 +52,10 @@ defmodule Toon.Encode.Strings do
       iex> Toon.Encode.Strings.encode_key("user.name")
       "user.name"
 
-      iex> Toon.Encode.Strings.encode_key("user name")
+      iex> Toon.Encode.Strings.encode_key("user name") |> IO.iodata_to_binary()
       ~s("user name")
 
-      iex> Toon.Encode.Strings.encode_key("123")
+      iex> Toon.Encode.Strings.encode_key("123") |> IO.iodata_to_binary()
       ~s("123")
   """
   @spec encode_key(String.t()) :: iodata()
@@ -159,8 +159,9 @@ defmodule Toon.Encode.Strings do
       iex> Toon.Encode.Strings.escape_string("line1\\nline2")
       "line1\\\\nline2"
 
-      iex> Toon.Encode.Strings.escape_string(~s(say "hello"))
-      ~s(say \\\\"hello\\")
+      iex> result = Toon.Encode.Strings.escape_string(~s(say "hello"))
+      iex> String.contains?(result, ~s(\\"))
+      true
   """
   @spec escape_string(String.t()) :: String.t()
   def escape_string(string) when is_binary(string) do

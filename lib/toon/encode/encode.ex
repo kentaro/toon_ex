@@ -138,8 +138,9 @@ defmodule Toon.Encode do
           |> Enum.map(&Primitives.encode(&1, opts.delimiter))
           |> Enum.intersperse(opts.delimiter)
         else
-          # For complex top-level arrays, encode as list items
-          Arrays.encode_list("items", data, depth, opts)
+          # For complex top-level arrays, encode as list items without header
+          [_header | items] = Arrays.encode_list("items", data, depth, opts)
+          items
           |> Enum.map_join("\n", &IO.iodata_to_binary/1)
         end
 

@@ -16,8 +16,8 @@ defmodule Toon.Decode.Strings do
       iex> Toon.Decode.Strings.unescape_string("hello\\\\nworld")
       "hello\\nworld"
 
-      iex> Toon.Decode.Strings.unescape_string("say \\\\\"hello\\\\\"")
-      "say \\"hello\\""
+      iex> Toon.Decode.Strings.unescape_string(~s(say \\"hello\\"))
+      ~s(say "hello")
   """
   @spec unescape_string(String.t()) :: String.t()
   def unescape_string(string) when is_binary(string) do

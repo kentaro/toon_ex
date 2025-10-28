@@ -28,8 +28,8 @@ defmodule Toon.Decode.Options do
       iex> Toon.Decode.Options.validate(keys: :atoms)
       {:ok, %{keys: :atoms}}
 
-      iex> Toon.Decode.Options.validate(keys: :invalid)
-      {:error, _}
+      iex> match?({:error, _}, Toon.Decode.Options.validate(keys: :invalid))
+      true
   """
   @spec validate(keyword()) :: {:ok, map()} | {:error, NimbleOptions.ValidationError.t()}
   def validate(opts) when is_list(opts) do

@@ -75,9 +75,19 @@ defmodule Toon.Encode.Objects do
   defp append_lines(writer, [], _depth), do: writer
 
   defp append_lines(writer, lines, depth) when is_list(lines) do
-    Enum.reduce(lines, writer, fn line, acc ->
-      Writer.push(acc, line, depth)
-    end)
+    # For arrays, the first line is the header at current depth
+    # Subsequent lines (data rows for tabular format) should be one level deeper
+    case lines do
+      [header | data_rows] ->
+        writer = Writer.push(writer, header, depth)
+
+        Enum.reduce(data_rows, writer, fn row, acc ->
+          Writer.push(acc, row, depth + 1)
+        end)
+
+      [] ->
+        writer
+    end
   end
 
   defp append_iodata(writer, iodata, _base_depth) do

@@ -20,10 +20,10 @@ defmodule Toon.Encode.Writer do
 
   ## Examples
 
-      iex> writer = Toon.Encode.Writer.new(2)
+      iex> Toon.Encode.Writer.new(2)
       %Toon.Encode.Writer{lines: [], indent_string: "  "}
 
-      iex> writer = Toon.Encode.Writer.new(4)
+      iex> Toon.Encode.Writer.new(4)
       %Toon.Encode.Writer{lines: [], indent_string: "    "}
   """
   @spec new(pos_integer()) :: t()

@@ -37,8 +37,9 @@ defmodule Toon.Encode.Arrays do
 
   ## Examples
 
-      iex> Toon.Encode.Arrays.encode_empty("items")
-      ["items[0]:"]
+      iex> result = Toon.Encode.Arrays.encode_empty("items")
+      iex> IO.iodata_to_binary(result)
+      "items[0]:"
   """
   @spec encode_empty(String.t()) :: [iodata()]
   def encode_empty(key) do
@@ -50,7 +51,10 @@ defmodule Toon.Encode.Arrays do
 
   ## Examples
 
-      tags[2]: reading,gaming
+      iex> opts = %{delimiter: ",", length_marker: nil}
+      iex> result = Toon.Encode.Arrays.encode_inline("tags", ["reading", "gaming"], opts)
+      iex> IO.iodata_to_binary(result)
+      "tags[2]: reading,gaming"
   """
   @spec encode_inline(String.t(), list(), map()) :: [iodata()]
   def encode_inline(key, list, opts) do
@@ -70,11 +74,18 @@ defmodule Toon.Encode.Arrays do
   @doc """
   Encodes a uniform object array in tabular format.
 
+  Returns a list where the first element is the header, and subsequent elements
+  are data rows (without indentation - indentation is added by the Writer).
+
   ## Examples
 
-      users[2]{name,age}:
-        Alice,30
-        Bob,25
+      iex> opts = %{delimiter: ",", length_marker: nil, indent_string: "  "}
+      iex> users = [%{"name" => "Alice", "age" => 30}, %{"name" => "Bob", "age" => 25}]
+      iex> [header | rows] = Toon.Encode.Arrays.encode_tabular("users", users, 0, opts)
+      iex> IO.iodata_to_binary(header)
+      "users[2]{age,name}:"
+      iex> Enum.map(rows, &IO.iodata_to_binary/1)
+      ["30,Alice", "25,Bob"]
   """
   @spec encode_tabular(String.t(), list(), non_neg_integer(), map()) :: [iodata()]
   def encode_tabular(key, list, _depth, opts) do
@@ -103,6 +114,7 @@ defmodule Toon.Encode.Arrays do
     ]
 
     # Format data rows
+    # Data rows will be indented by the Writer in Objects module
     rows =
       Enum.map(list, fn obj ->
         values =
@@ -120,13 +132,18 @@ defmodule Toon.Encode.Arrays do
   @doc """
   Encodes an array in list format (for mixed or non-uniform arrays).
 
+  Returns a list where the first element is the header, and subsequent elements
+  are list items (without base indentation - indentation is added by the Writer).
+
   ## Examples
 
-      items[2]:
-      - type: book
-        title: "1984"
-      - type: movie
-        title: "Inception"
+      iex> opts = %{delimiter: ",", length_marker: nil, indent_string: "  "}
+      iex> items = [%{"title" => "Book", "price" => 9.99}, %{"title" => "Movie", "duration" => 120}]
+      iex> [header | list_items] = Toon.Encode.Arrays.encode_list("items", items, 0, opts)
+      iex> IO.iodata_to_binary(header)
+      "items[2]:"
+      iex> Enum.map(list_items, &IO.iodata_to_binary/1)
+      ["- price: 9.99", "  title: Book", "- duration: 120", "  title: Movie"]
   """
   @spec encode_list(String.t(), list(), non_neg_integer(), map()) :: [iodata()]
   def encode_list(key, list, depth, opts) do
@@ -163,6 +180,7 @@ defmodule Toon.Encode.Arrays do
 
   defp encode_list_item(item, _depth, opts) do
     # Primitive item in list
+    # Indentation will be added by Writer in Objects module
     [
       [
         Constants.list_item_marker(),
@@ -183,6 +201,9 @@ defmodule Toon.Encode.Arrays do
   # Encode primitive values
   defp encode_value_with_optional_marker(key, v, needs_marker, _depth, opts)
        when is_nil(v) or is_boolean(v) or is_number(v) or is_binary(v) do
+    # Indentation will be added by Writer in Objects module
+    extra_indent = if needs_marker, do: "", else: opts.indent_string
+
     line = [
       key,
       Constants.colon(),
@@ -194,7 +215,7 @@ defmodule Toon.Encode.Arrays do
       if needs_marker do
         [Constants.list_item_marker(), Constants.space() | line]
       else
-        line
+        [extra_indent | line]
       end
 
     [final_line]
@@ -202,43 +223,51 @@ defmodule Toon.Encode.Arrays do
 
   # Encode list values
   defp encode_value_with_optional_marker(key, v, needs_marker, depth, opts) when is_list(v) do
+    # Indentation will be added by Writer in Objects module
     nested = encode(key, v, depth + 1, opts)
 
     if needs_marker do
       [first_line | rest] = nested
-      [[Constants.list_item_marker(), Constants.space(), first_line] | rest]
+      [
+        [Constants.list_item_marker(), Constants.space(), first_line]
+        | Enum.map(rest, fn line -> [opts.indent_string, line] end)
+      ]
     else
-      nested
+      Enum.map(nested, fn line -> [opts.indent_string, line] end)
     end
   end
 
   # Encode map values
   defp encode_value_with_optional_marker(key, v, needs_marker, _depth, opts) when is_map(v) do
+    # Indentation will be added by Writer in Objects module
     header = [key, Constants.colon()]
 
     nested_lines =
       v
       |> Enum.sort_by(fn {nk, _nv} -> nk end)
       |> Enum.map(fn {nk, nv} ->
-        encode_nested_primitive_or_placeholder(nk, nv, opts)
+        [opts.indent_string, encode_nested_primitive_or_placeholder(nk, nv, opts)]
       end)
 
     if needs_marker do
       [[Constants.list_item_marker(), Constants.space(), header] | nested_lines]
     else
-      [header | nested_lines]
+      [[opts.indent_string, header] | nested_lines]
     end
   end
 
   # Fallback for unsupported types
-  defp encode_value_with_optional_marker(key, _v, needs_marker, _depth, _opts) do
+  defp encode_value_with_optional_marker(key, _v, needs_marker, _depth, opts) do
+    # Indentation will be added by Writer in Objects module
+    extra_indent = if needs_marker, do: "", else: opts.indent_string
+
     line = [key, Constants.colon(), Constants.space(), Constants.null_literal()]
 
     final_line =
       if needs_marker do
         [Constants.list_item_marker(), Constants.space() | line]
       else
-        line
+        [extra_indent | line]
       end
 
     [final_line]

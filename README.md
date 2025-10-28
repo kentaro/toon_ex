@@ -103,9 +103,9 @@ Toon.encode!(%{
   ]
 })
 # =>
-# users[2]{name,age}:
-#   Alice,30
-#   Bob,25
+# users[2]{age,name}:
+#   30,Alice
+#   25,Bob
 
 # List-style arrays (mixed or nested)
 Toon.encode!(%{
@@ -116,10 +116,10 @@ Toon.encode!(%{
 })
 # =>
 # items[2]:
-#   - type: book
-#     title: Elixir Guide
-#   - type: video
-#     duration: 120
+#   - title: "Elixir Guide"
+#     type: book
+#   - duration: 120
+#     type: video
 
 # Top-level arrays
 Toon.encode!(["a", "b", "c"])
