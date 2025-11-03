@@ -105,12 +105,13 @@ defmodule Toon.Constants do
 
   @doc """
   Returns the list of structure characters that require quoting in keys and values.
+  Note: Comma is NOT included here as it's only special when it's the active delimiter.
   """
   @spec structure_chars() :: [String.t()]
   def structure_chars do
     [
       @colon,
-      @comma,
+      # @comma - NOT included, checked separately based on delimiter
       @open_bracket,
       @close_bracket,
       @open_brace,

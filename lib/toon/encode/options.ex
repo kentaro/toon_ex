@@ -20,6 +20,11 @@ defmodule Toon.Encode.Options do
       type: {:or, [:string, nil]},
       default: nil,
       doc: "Prefix for array length marker (e.g., '#' produces '[#3]')"
+    ],
+    key_order: [
+      type: :any,
+      default: nil,
+      doc: "Key ordering information for preserving map key order"
     ]
   ]
 

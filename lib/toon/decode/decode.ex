@@ -5,7 +5,7 @@ defmodule Toon.Decode do
   Parses TOON format strings and converts them to Elixir data structures.
   """
 
-  alias Toon.Decode.{Options, Parser}
+  alias Toon.Decode.{Options, StructuralParser}
   alias Toon.DecodeError
 
   @doc """
@@ -106,43 +106,13 @@ defmodule Toon.Decode do
 
   @spec do_decode(String.t(), map()) :: term()
   defp do_decode(string, opts) do
-    lines =
-      string
-      |> String.split("\n")
-      |> Enum.map(&String.trim_trailing/1)
-      |> Enum.reject(&(&1 == ""))
+    # Use structural parser for full TOON support
+    case StructuralParser.parse(string, opts) do
+      {:ok, result} ->
+        result
 
-    entries =
-      Enum.map(lines, fn line ->
-        case parse_line(line) do
-          {:ok, {key, value}} -> {key, value}
-          {:error, reason} -> raise DecodeError, message: "Parse error: #{reason}", input: line
-        end
-      end)
-
-    # Convert to map with appropriate key type
-    case opts.keys do
-      :strings ->
-        Map.new(entries)
-
-      :atoms ->
-        Map.new(entries, fn {k, v} -> {String.to_atom(k), v} end)
-
-      :atoms! ->
-        Map.new(entries, fn {k, v} -> {String.to_existing_atom(k), v} end)
-    end
-  end
-
-  defp parse_line(line) do
-    case Parser.parse_line(line) do
-      {:ok, [result], "", _, _, _} ->
-        {:ok, result}
-
-      {:ok, _, rest, _, _, _} ->
-        {:error, "unexpected characters: #{rest}"}
-
-      {:error, reason, _rest, _, _, _} ->
-        {:error, reason}
+      {:error, error} ->
+        raise error
     end
   end
 end

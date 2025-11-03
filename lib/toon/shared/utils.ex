@@ -182,8 +182,8 @@ defmodule Toon.Utils do
 
   def normalize(value) when is_number(value) do
     cond do
-      # Handle negative zero
-      value == 0 and :math.atan2(value, -1) == :math.pi() -> 0.0
+      # Handle negative zero - normalize to integer 0 per TOON spec
+      value == 0 and :math.atan2(value, -1) == :math.pi() -> 0
       # Handle infinity and NaN
       not is_finite(value) -> nil
       true -> value

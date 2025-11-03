@@ -1,7 +1,7 @@
 defmodule Toon.MixProject do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
   @source_url "https://github.com/kentaro/toon_ex"
 
   def project do
@@ -44,7 +44,7 @@ defmodule Toon.MixProject do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib"]
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
@@ -66,7 +66,6 @@ defmodule Toon.MixProject do
       {:jason, "~> 1.4", only: [:dev, :test], runtime: false},
 
       # Test dependencies
-      {:stream_data, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
 
       # Code quality

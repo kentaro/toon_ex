@@ -79,11 +79,13 @@ defmodule Toon.Decode.Parser do
       string_value
     ])
 
-  # Array length marker: [123] or [#123]
+  # Array length marker: [123] or [#123] or [123\t] or [123|]
+  # Per TOON spec Section 6, non-comma delimiters are indicated in the header
   array_length =
     ignore(string("["))
     |> optional(ignore(string("#")))
     |> ascii_string([?0..?9], min: 1)
+    |> optional(ignore(choice([string("\t"), string("|")])))
     |> ignore(string("]"))
     |> map({String, :to_integer, []})
     |> unwrap_and_tag(:array_length)

@@ -18,8 +18,8 @@ defmodule Toon.Encode.Strings do
       iex> Toon.Encode.Strings.encode_string("") |> IO.iodata_to_binary()
       ~s("")
 
-      iex> Toon.Encode.Strings.encode_string("hello world") |> IO.iodata_to_binary()
-      ~s("hello world")
+      iex> Toon.Encode.Strings.encode_string("hello world")
+      "hello world"
 
       iex> Toon.Encode.Strings.encode_string("line1\\nline2") |> IO.iodata_to_binary()
       ~s("line1\\\\nline2")
@@ -58,7 +58,7 @@ defmodule Toon.Encode.Strings do
       iex> Toon.Encode.Strings.encode_key("123") |> IO.iodata_to_binary()
       ~s("123")
   """
-  @spec encode_key(String.t()) :: iodata()
+  @spec encode_key(String.t()) :: String.t() | [String.t(), ...]
   def encode_key(key) when is_binary(key) do
     if safe_key?(key) do
       key
@@ -102,10 +102,9 @@ defmodule Toon.Encode.Strings do
            needs_quoting_delimiter?(string, delimiter))
   end
 
-  # Check basic quoting requirements (spaces, literals, numbers, structure)
+  # Check basic quoting requirements (leading/trailing spaces, literals, numbers, structure)
   defp needs_quoting_basic?(string) do
     has_leading_or_trailing_space?(string) or
-      contains_space?(string) or
       literal?(string) or
       looks_like_number?(string) or
       contains_structure_chars?(string) or
@@ -177,10 +176,6 @@ defmodule Toon.Encode.Strings do
 
   defp has_leading_or_trailing_space?(string) do
     String.starts_with?(string, " ") or String.ends_with?(string, " ")
-  end
-
-  defp contains_space?(string) do
-    String.contains?(string, " ")
   end
 
   defp literal?(string) do

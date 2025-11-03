@@ -76,7 +76,7 @@ defmodule Toon do
       {:ok, "user:\\n  name: Bob"}
 
       iex> Toon.encode(%{"data" => [1, 2, 3]}, delimiter: "\\t")
-      {:ok, "data[3]: 1\\t2\\t3"}
+      {:ok, "data[3\\t]: 1\\t2\\t3"}
   """
   @spec encode(Toon.Types.encodable(), keyword()) ::
           {:ok, String.t()} | {:error, EncodeError.t()}

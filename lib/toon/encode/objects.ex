@@ -21,14 +21,45 @@ defmodule Toon.Encode.Objects do
   def encode(map, depth, opts) when is_map(map) do
     writer = Writer.new(opts.indent)
 
+    # Get the keys in the correct order
+    keys = get_ordered_keys(map, Map.get(opts, :key_order), [])
+
     writer =
-      map
-      |> Enum.sort_by(fn {k, _v} -> k end)
-      |> Enum.reduce(writer, fn {key, value}, acc ->
+      keys
+      |> Enum.reduce(writer, fn key, acc ->
+        value = Map.get(map, key)
         encode_entry(acc, key, value, depth, opts)
       end)
 
     Writer.to_iodata(writer)
+  end
+
+  # Get keys in the correct order based on key_order option
+  defp get_ordered_keys(map, key_order, path) do
+    cond do
+      # If we have key order information for this path, use it
+      is_map(key_order) and Map.has_key?(key_order, path) ->
+        ordered = Map.get(key_order, path)
+        # Filter to only include keys that exist in the map
+        Enum.filter(ordered, &Map.has_key?(map, &1))
+
+      # If key_order is a list (simple case) and this is the root level, use it
+      is_list(key_order) and not Enum.empty?(key_order) and path == [] ->
+        # Filter to only include keys that exist in the map and match the order
+        existing_keys = Map.keys(map)
+        ordered_existing = Enum.filter(key_order, &(&1 in existing_keys))
+
+        # If all keys are in the order list, use it; otherwise fallback to sorted
+        if length(ordered_existing) == length(existing_keys) do
+          ordered_existing
+        else
+          Enum.sort(existing_keys)
+        end
+
+      # If key_order is nil or not applicable, sort keys alphabetically for consistent output
+      true ->
+        Map.keys(map) |> Enum.sort()
+    end
   end
 
   @doc """

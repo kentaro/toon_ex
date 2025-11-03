@@ -8,6 +8,16 @@ defmodule Toon.Decode.Options do
       type: {:in, [:strings, :atoms, :atoms!]},
       default: :strings,
       doc: "How to decode map keys: :strings | :atoms | :atoms!"
+    ],
+    strict: [
+      type: :boolean,
+      default: true,
+      doc: "Enable strict mode validation (indentation, blank lines, etc.)"
+    ],
+    indent_size: [
+      type: :pos_integer,
+      default: 2,
+      doc: "Expected indentation size in spaces (for strict mode validation)"
     ]
   ]
 
@@ -23,10 +33,10 @@ defmodule Toon.Decode.Options do
   ## Examples
 
       iex> Toon.Decode.Options.validate([])
-      {:ok, %{keys: :strings}}
+      {:ok, %{keys: :strings, strict: true, indent_size: 2}}
 
       iex> Toon.Decode.Options.validate(keys: :atoms)
-      {:ok, %{keys: :atoms}}
+      {:ok, %{keys: :atoms, strict: true, indent_size: 2}}
 
       iex> match?({:error, _}, Toon.Decode.Options.validate(keys: :invalid))
       true

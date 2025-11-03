@@ -106,7 +106,7 @@ defmodule Toon.Encode.Writer do
       iex> IO.iodata_to_binary(iodata)
       "name: Alice"
   """
-  @spec to_iodata(t()) :: iodata()
+  @spec to_iodata(t()) :: [iodata()]
   def to_iodata(%__MODULE__{lines: lines}) do
     lines
     |> Enum.reverse()

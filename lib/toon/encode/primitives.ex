@@ -68,24 +68,27 @@ defmodule Toon.Encode.Primitives do
 
       # Check if it's a whole number
       trunc(value) == value ->
-        # Format as integer if no decimal part
-        "#{trunc(value)}.0"
+        # Format as integer without .0 per TOON spec
+        Integer.to_string(trunc(value))
 
       true ->
-        # Format normally, avoiding scientific notation
-        formatted = :erlang.float_to_binary(value, [:compact, decimals: 10])
-        # Remove trailing zeros after decimal point
-        formatted
-        |> String.replace(~r/\.?0+$/, "")
-        |> ensure_decimal_point()
-    end
-  end
+        # Format with full precision (17 significant digits for IEEE 754 double precision)
+        # Use ~.16g to get full precision without scientific notation for most cases
+        # But we need to be careful with the format
+        str = Float.to_string(value)
 
-  defp ensure_decimal_point(string) do
-    if String.contains?(string, ".") do
-      string
-    else
-      string <> ".0"
+        # Check if scientific notation was used
+        if String.contains?(str, "e") or String.contains?(str, "E") do
+          # Convert from scientific notation
+          {float_val, ""} = Float.parse(str)
+          # Format with enough precision to preserve the value
+          :io_lib.format("~.16f", [float_val])
+          |> IO.iodata_to_binary()
+          |> String.replace(~r/(\.\d*?)0+$/, "\\1")
+          |> String.replace(~r/\.$/, "")
+        else
+          str
+        end
     end
   end
 end
