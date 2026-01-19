@@ -87,7 +87,7 @@ defimpl Toon.Encoder, for: Any do
         only
 
       except = Keyword.get(opts, :except) ->
-        Map.keys(struct) -- ([:__struct__] -- except)
+        Map.keys(struct) -- [:__struct__ | except]
 
       true ->
         Map.keys(struct) -- [:__struct__]
