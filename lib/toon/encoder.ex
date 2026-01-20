@@ -42,13 +42,10 @@ defimpl Toon.Encoder, for: Any do
 
     quote do
       defimpl Toon.Encoder, for: unquote(module) do
-        def encode(struct, opts) do
-          map =
-            struct
-            |> Map.take(unquote(fields))
-            |> Map.new(fn {k, v} -> {to_string(k), v} end)
-
-          Toon.Encode.encode!(map, opts)
+        def encode(struct, _opts) do
+          struct
+          |> Map.take(unquote(fields))
+          |> Map.new(fn {k, v} -> {to_string(k), Toon.Utils.normalize(v)} end)
         end
       end
     end

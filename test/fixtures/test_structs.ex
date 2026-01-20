@@ -13,3 +13,13 @@ defimpl Toon.Encoder, for: Toon.Fixtures.CustomDate do
     "#{y}-#{String.pad_leading(to_string(m), 2, "0")}-#{String.pad_leading(to_string(d), 2, "0")}"
   end
 end
+
+defmodule Toon.Fixtures.Person do
+  @derive Toon.Encoder
+  defstruct [:name, :age]
+end
+
+defmodule Toon.Fixtures.Company do
+  @derive Toon.Encoder
+  defstruct [:name, :ceo]
+end
