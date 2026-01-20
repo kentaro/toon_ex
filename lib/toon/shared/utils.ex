@@ -194,6 +194,13 @@ defmodule Toon.Utils do
     Enum.map(value, &normalize/1)
   end
 
+  # # Structs - dispatch to Toon.Encoder protocol
+  def normalize(%{__struct__: _} = struct) do
+    struct
+    |> Toon.Encoder.encode([])
+    |> IO.iodata_to_binary()
+  end
+
   def normalize(value) when is_map(value) do
     Map.new(value, fn {k, v} ->
       {to_string(k), normalize(v)}
