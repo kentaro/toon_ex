@@ -26,7 +26,8 @@ defmodule Toon.MixProject do
           :underspecs,
           :unmatched_returns,
           :unknown
-        ]
+        ],
+        ignore_warnings: ".dialyzer_ignore.exs"
       ],
       aliases: aliases()
     ]

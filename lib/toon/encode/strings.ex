@@ -24,7 +24,7 @@ defmodule Toon.Encode.Strings do
       iex> Toon.Encode.Strings.encode_string("line1\\nline2") |> IO.iodata_to_binary()
       ~s("line1\\\\nline2")
   """
-  @spec encode_string(String.t(), String.t()) :: iodata()
+  @spec encode_string(String.t(), String.t()) :: binary() | nonempty_list(binary())
   def encode_string(string, delimiter \\ ",") when is_binary(string) do
     if safe_unquoted?(string, delimiter) do
       string

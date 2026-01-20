@@ -51,7 +51,6 @@ defimpl Toon.Encoder, for: Any do
     end
   end
 
-  @spec encode(struct(), keyword()) :: no_return()
   def encode(%_{} = struct, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,
@@ -71,7 +70,6 @@ defimpl Toon.Encoder, for: Any do
       """
   end
 
-  @spec encode(term(), keyword()) :: no_return()
   def encode(value, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,

@@ -5,6 +5,15 @@ defmodule Toon.Encode.Options do
 
   alias Toon.Constants
 
+  @typedoc "Validated encoding options"
+  @type validated :: %{
+          indent: pos_integer(),
+          delimiter: String.t(),
+          length_marker: String.t() | nil,
+          key_order: term(),
+          indent_string: String.t()
+        }
+
   @options_schema [
     indent: [
       type: :pos_integer,
@@ -90,7 +99,7 @@ defmodule Toon.Encode.Options do
       iex> Toon.Encode.Options.validate!(indent: 4)
       %{indent: 4, delimiter: ",", length_marker: nil, indent_string: "    "}
   """
-  @spec validate!(keyword()) :: map()
+  @spec validate!(keyword()) :: validated()
   def validate!(opts) when is_list(opts) do
     case validate(opts) do
       {:ok, validated} ->
