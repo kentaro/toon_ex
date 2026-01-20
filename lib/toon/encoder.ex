@@ -32,7 +32,7 @@ defprotocol Toon.Encoder do
 
   Returns IO data that can be converted to a string.
   """
-  @spec encode(t, keyword()) :: iodata()
+  @spec encode(t, keyword()) :: iodata() | map()
   def encode(value, opts)
 end
 

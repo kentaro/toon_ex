@@ -1,4 +1,5 @@
 defmodule Toon.Fixtures.UserWithExcept do
+  @moduledoc false
   @derive {Toon.Encoder, except: [:password]}
   defstruct [:name, :email, :password]
 end
@@ -15,11 +16,13 @@ defimpl Toon.Encoder, for: Toon.Fixtures.CustomDate do
 end
 
 defmodule Toon.Fixtures.Person do
+  @moduledoc false
   @derive Toon.Encoder
   defstruct [:name, :age]
 end
 
 defmodule Toon.Fixtures.Company do
+  @moduledoc false
   @derive Toon.Encoder
   defstruct [:name, :ceo]
 end

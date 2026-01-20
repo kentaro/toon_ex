@@ -1,7 +1,7 @@
 defmodule Toon.NestedStructTest do
   use ExUnit.Case, async: true
 
-  alias Toon.Fixtures.{Person, Company}
+  alias Toon.Fixtures.{Company, Person}
 
   describe "nested struct encoding" do
     test "encodes and decodes nested structs correctly" do
