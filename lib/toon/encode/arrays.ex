@@ -49,7 +49,8 @@ defmodule Toon.Encode.Arrays do
       iex> IO.iodata_to_binary(result)
       "items[0]:"
   """
-  @spec encode_empty(String.t(), String.t() | nil) :: [iodata()]
+  @spec encode_empty(String.t(), String.t() | nil) ::
+          nonempty_list(nonempty_list(binary() | nonempty_list(binary())))
   def encode_empty(key, length_marker \\ nil) do
     marker = format_length_marker(0, length_marker)
     [[Strings.encode_key(key), "[", marker, "]", Constants.colon()]]

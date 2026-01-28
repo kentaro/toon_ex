@@ -15,18 +15,25 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: ['1.15', '1.16', '1.17', '1.18', '1.19']
-        otp: ['25', '26', '27']
+        elixir: ["1.15", "1.16", "1.17", "1.18", "1.19"]
+        otp: ["25", "26", "27", "28"]
         exclude:
-          # Elixir 1.15 doesn't support OTP 27
-          - elixir: '1.15'
-            otp: '27'
-          # Elixir 1.16 doesn't support OTP 27
-          - elixir: '1.16'
-            otp: '27'
+          # Elixir 1.15 doesn't support OTP 27+
+          - elixir: "1.15"
+            otp: "27"
+          - elixir: "1.15"
+            otp: "28"
+          # Elixir 1.16 doesn't support OTP 27+
+          - elixir: "1.16"
+            otp: "27"
+          - elixir: "1.16"
+            otp: "28"
+          # Elixir 1.17 doesn't support OTP 28
+          - elixir: "1.17"
+            otp: "28"
           # Elixir 1.19 doesn't support OTP 25
-          - elixir: '1.19'
-            otp: '25'
+          - elixir: "1.19"
+            otp: "25"
 
     steps:
       - name: Checkout code
@@ -65,8 +72,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: ['1.19']
-        otp: ['27']
+        elixir: ["1.19"]
+        otp: ["28"]
 
     steps:
       - name: Checkout code
@@ -75,8 +82,8 @@ jobs:
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{matrix.elixir}}
-          otp-version: ${{matrix.otp}}
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -88,22 +95,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
 
+      - name: Restore PLT cache
+        uses: actions/cache@v4
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-plt-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-plt-${{ matrix.elixir }}-${{ matrix.otp }}-
+
       - name: Install dependencies
         run: mix deps.get
 
-      - name: Check formatting
-        run: mix format --check-formatted
-
-      - name: Run Credo
-        run: mix credo --strict
+      - name: Run quality checks
+        run: mix quality.ci
 
   coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: ['1.19']
-        otp: ['27']
+        elixir: ["1.19"]
+        otp: ["27"]
 
     steps:
       - name: Checkout code

@@ -194,6 +194,19 @@ defmodule Toon.Utils do
     Enum.map(value, &normalize/1)
   end
 
+  # Structs - dispatch to Toon.Encoder protocol
+  def normalize(%{__struct__: _} = struct) do
+    result = Toon.Encoder.encode(struct, [])
+
+    # If encoder returns iodata (string), convert it to binary
+    # If encoder returns a map (from @derive), use it directly
+    case result do
+      binary when is_binary(binary) -> binary
+      map when is_map(map) -> map
+      iodata -> IO.iodata_to_binary(iodata)
+    end
+  end
+
   def normalize(value) when is_map(value) do
     Map.new(value, fn {k, v} ->
       {to_string(k), normalize(v)}

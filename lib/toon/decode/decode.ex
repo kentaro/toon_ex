@@ -8,6 +8,9 @@ defmodule Toon.Decode do
   alias Toon.Decode.{Options, StructuralParser}
   alias Toon.DecodeError
 
+  @typedoc "Decoded TOON value"
+  @type decoded :: nil | boolean() | binary() | number() | list() | map()
+
   @doc """
   Decodes a TOON format string to Elixir data.
 
@@ -94,7 +97,7 @@ defmodule Toon.Decode do
       iex> Toon.Decode.decode!("count: 42")
       %{"count" => 42}
   """
-  @spec decode!(String.t(), keyword()) :: term()
+  @spec decode!(String.t(), keyword()) :: decoded()
   def decode!(string, opts \\ []) when is_binary(string) do
     case decode(string, opts) do
       {:ok, result} -> result
@@ -104,7 +107,7 @@ defmodule Toon.Decode do
 
   # Private functions
 
-  @spec do_decode(String.t(), map()) :: term()
+  @spec do_decode(String.t(), map()) :: decoded()
   defp do_decode(string, opts) do
     # Use structural parser for full TOON support
     case StructuralParser.parse(string, opts) do

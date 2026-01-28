@@ -2,6 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/toon.svg)](https://hex.pm/packages/toon)
 [![Documentation](https://img.shields.io/badge/docs-hexdocs-blue.svg)](https://hexdocs.pm/toon)
+[![Coverage Status](https://coveralls.io/repos/github/kentaro/toon_ex/badge.svg?branch=main)](https://coveralls.io/github/xu-chris/toon_ex?branch=main)
 
 **TOON (Token-Oriented Object Notation)** encoder and decoder for Elixir.
 

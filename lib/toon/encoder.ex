@@ -32,7 +32,7 @@ defprotocol Toon.Encoder do
 
   Returns IO data that can be converted to a string.
   """
-  @spec encode(t, keyword()) :: iodata()
+  @spec encode(t, keyword()) :: iodata() | map()
   def encode(value, opts)
 end
 
@@ -42,19 +42,15 @@ defimpl Toon.Encoder, for: Any do
 
     quote do
       defimpl Toon.Encoder, for: unquote(module) do
-        def encode(struct, opts) do
-          map =
-            struct
-            |> Map.take(unquote(fields))
-            |> Map.new(fn {k, v} -> {to_string(k), v} end)
-
-          Toon.Encode.encode!(map, opts)
+        def encode(struct, _opts) do
+          struct
+          |> Map.take(unquote(fields))
+          |> Map.new(fn {k, v} -> {to_string(k), Toon.Utils.normalize(v)} end)
         end
       end
     end
   end
 
-  @spec encode(struct(), keyword()) :: no_return()
   def encode(%_{} = struct, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,
@@ -74,7 +70,6 @@ defimpl Toon.Encoder, for: Any do
       """
   end
 
-  @spec encode(term(), keyword()) :: no_return()
   def encode(value, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,
@@ -87,7 +82,7 @@ defimpl Toon.Encoder, for: Any do
         only
 
       except = Keyword.get(opts, :except) ->
-        Map.keys(struct) -- ([:__struct__] -- except)
+        Map.keys(struct) -- [:__struct__ | except]
 
       true ->
         Map.keys(struct) -- [:__struct__]

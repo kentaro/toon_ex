@@ -157,8 +157,6 @@ defmodule Toon.Decode.StructuralParser do
     end
   end
 
-  defp detect_root_type([]), do: {:object, nil}
-
   # Parse root primitive value (single value without key)
   defp parse_root_primitive([%{content: content}], _opts) do
     # For root primitives, we parse directly without parser combinator

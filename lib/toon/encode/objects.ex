@@ -17,7 +17,7 @@ defmodule Toon.Encode.Objects do
       iex> Toon.Encode.Objects.encode(map, 0, opts)
 
   """
-  @spec encode(map(), non_neg_integer(), map()) :: iodata()
+  @spec encode(map(), non_neg_integer(), map()) :: [iodata()]
   def encode(map, depth, opts) when is_map(map) do
     writer = Writer.new(opts.indent)
 
@@ -103,22 +103,14 @@ defmodule Toon.Encode.Objects do
 
   # Private helpers
 
-  defp append_lines(writer, [], _depth), do: writer
-
-  defp append_lines(writer, lines, depth) when is_list(lines) do
+  defp append_lines(writer, [header | data_rows], depth) do
     # For arrays, the first line is the header at current depth
     # Subsequent lines (data rows for tabular format) should be one level deeper
-    case lines do
-      [header | data_rows] ->
-        writer = Writer.push(writer, header, depth)
+    writer = Writer.push(writer, header, depth)
 
-        Enum.reduce(data_rows, writer, fn row, acc ->
-          Writer.push(acc, row, depth + 1)
-        end)
-
-      [] ->
-        writer
-    end
+    Enum.reduce(data_rows, writer, fn row, acc ->
+      Writer.push(acc, row, depth + 1)
+    end)
   end
 
   defp append_iodata(writer, iodata, _base_depth) do
